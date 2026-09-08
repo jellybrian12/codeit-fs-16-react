@@ -3,6 +3,8 @@ import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
+import { HelloBox } from './HelloBox.jsx'
+import { ProfileCard } from './lab/p2-01/practice1.jsx'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -17,6 +19,8 @@ function App() {
         </div>
         <div>
           <h1>Get started</h1>
+          <HelloBox/>
+          <ProfileCard/>
           <p>
             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
           </p>
