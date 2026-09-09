@@ -17,12 +17,14 @@ const FeedItem = ({
   minutesAgo,
   likeCount,
   commentCount,
+  onDelete
 }) => {
   return (
     <article className={styles.post}>
       <FeedItemHeader 
         username={username} 
         profileImage={profileImage} 
+        onDelete={onDelete}
       />
 
       <div className={styles.imageContainer}>
