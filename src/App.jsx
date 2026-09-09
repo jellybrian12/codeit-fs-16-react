@@ -1,6 +1,8 @@
 import FeedItem from "./components/FeedItem.jsx";
 import Stories from "./lab/p2-04/practice1.jsx";
 import styles from'./components/FeedList.module.scss'
+import LabPanel from "./lab/p2-06/practice1.jsx";
+import LiftedPanel from "./lab/p2-06/practice2.jsx";
 
 function App() {
   return (
@@ -25,7 +27,6 @@ function App() {
         likeCount={87}
         commentCount={12}
       />
-      <Stories/>
     </div>
 
   );

@@ -3,7 +3,6 @@ import styles from './FeedItem.module.scss'
 import { FaHeart, FaRegBookmark, FaRegComment, FaRegHeart, FaRegPaperPlane } from "react-icons/fa6";
 
 const FeedItemActions = ({likeCount}) => {
-
   // const [liked, setLiked] = useState(false);
   // const [count, setCount] = useState(likeCount);
 
