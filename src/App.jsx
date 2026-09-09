@@ -1,39 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import page from './components/FeedPage.module.scss';
 // import Stories from './lab/p2-07/practice3.jsx';
 import Stories from './components/Stories.jsx';
 import FeedList from "./components/FeedList.jsx";
 
-const initialPosts = [
-  {
-    id: 1,
-    username: 'jaehoon',
-    profileImage: 'https://picsum.photos/seed/jaehoon/40/40',
-    postImage: 'https://picsum.photos/seed/post1/600/600',
-    postAlt: '한강에서 찍은 노을 사진',
-    content: '오늘 한강 노을 실화냐 🌇',
-    minutesAgo: 32,
-    likeCount: 1240,
-    commentCount: 128,
-  },
-  {
-    id: 2,
-    username: 'minji',
-    profileImage: 'https://picsum.photos/seed/minji/40/40',
-    postImage: 'https://picsum.photos/seed/post2/600/600',
-    postAlt: '골목 카페 창가 사진',
-    content: '퇴근길에 발견한 카페 ☕',
-    minutesAgo: 8,
-    likeCount: 87,
-    commentCount: 12,
-  },
-];
-
-
 
 const App = () => {
   //데이터배열을 상태로 관리
-  const [posts, setPosts] = useState(initialPosts);
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/posts');
+        if (!response.ok) {
+          throw new Error(`서버가${response.status}로 답했어요`);
+        }
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error('게시물을 가져오지 못했어요.', error);
+      }
+    };
+
+    loadPosts();
+  }, []);
 
   const handleDelete  = (id)=>{
     //지운다는것은 -> 필터링한다는것
@@ -43,7 +34,10 @@ const App = () => {
   return (
     <main className={page.mainContent}>
       <Stories />
-      <FeedList posts={posts} onDelete={handleDelete}/>
+      <FeedList 
+        posts={posts} 
+        onDelete={handleDelete}
+      />
     </main>
   );
 }
