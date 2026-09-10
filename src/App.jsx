@@ -4,6 +4,7 @@ import page from './components/FeedPage.module.scss';
 import Stories from './components/Stories.jsx';
 import FeedList from "./components/FeedList.jsx";
 import stateStyles from './components/StatusMessage.module.scss';
+import CreateFeedModal from './components/CreateFeedModal.jsx';
 
 const PER_PAGE = 4;
 
@@ -17,7 +18,7 @@ const App = () => {
   const [error, setError] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [nextPage, setNextPage] = useState(null);
-
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
   const loaderRef = useRef(null);
 
   useEffect(() => {
@@ -125,6 +126,9 @@ const App = () => {
 
   return (
     <main className={page.mainContent}>
+      <button type="button" onClick={() => setIsCreateOpen(true)}>
+        새 게시물
+      </button>
       <Stories onSelect={handleSelectUser}/>
       {error ? (
         <p className={stateStyles.errorText}>{error}</p>
@@ -144,6 +148,9 @@ const App = () => {
           )} */}
         </>
       )}
+
+      {isCreateOpen && <CreateFeedModal onClose={()=> setIsCreateOpen(false)}/>}
+
     </main>
   );
 }
