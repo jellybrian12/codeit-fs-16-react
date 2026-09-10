@@ -23,7 +23,7 @@ const FeedSkeleton = () => (
   </div>
 );
 
-const FeedList = ({ posts, isLoading, onDelete, loaderRef }) => {
+const FeedList = ({ posts, isLoading, onDelete, loaderRef, onAddComment }) => {
   if (!isLoading && posts.length === 0) {
     return<p className={gridStyles.noPosts}>게시물이 없습니다.</p>;
   }
@@ -43,6 +43,7 @@ const FeedList = ({ posts, isLoading, onDelete, loaderRef }) => {
             likeCount={post.likeCount}
             commentCount={post.commentCount}
             onDelete={() => onDelete(post.id)}
+            onAddComment={() => onAddComment(post.id)}
           />
         ))}
       </div>

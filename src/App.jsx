@@ -5,7 +5,7 @@ import Stories from './components/Stories.jsx';
 import FeedList from "./components/FeedList.jsx";
 import stateStyles from './components/StatusMessage.module.scss';
 
-const PER_PAGE = 2;
+const PER_PAGE = 4;
 
 const App = () => {
   //데이터배열을 상태로 관리
@@ -69,24 +69,6 @@ const App = () => {
 
   }, [selectedUser, pageNumber]);
 
-  const handleDelete  = (id)=>{
-    //지운다는것은 -> 필터링한다는것
-    //지금 내가 지목한 얘 빼고 남겨줘 
-    setPosts(posts.filter(post => post.id !== id));
-  }
-
-  const handleSelectUser = (username) => {
-    // setSelectedUser(selectedUser === username ? null : username)
-    setSelectedUser((current) => (current === username ? null : username));
-    setPageNumber(1);
-    setPosts([])
-  };
-
-  // const handleLoadMore = () => {
-  //   setPageNumber((current) => current + 1);
-  // };
-  
-
   //무한 스크롤 옵저버 처리
   useEffect(()=>{
     if (nextPage === null || isLoading) {
@@ -104,12 +86,42 @@ const App = () => {
         setPageNumber((current) => current + 1);
       }
     })
-
     observer.observe(target);
 
     return () => observer.disconnect();
 
   },[nextPage, isLoading])
+
+  const handleDelete  = (id)=>{
+    //지운다는것은 -> 필터링한다는것
+    //지금 내가 지목한 얘 빼고 남겨줘 
+    setPosts(posts.filter(post => post.id !== id));
+  }
+
+  const handleSelectUser = (username) => {
+    // setSelectedUser(selectedUser === username ? null : username)
+    setSelectedUser((current) => (current === username ? null : username));
+    setPageNumber(1);
+    setPosts([])
+  };
+
+  // const handleLoadMore = () => {
+  //   setPageNumber((current) => current + 1);
+  // };
+  
+  const handleAddComment = (id) => {
+    setPosts((current) =>
+      current.map((post) =>
+        post.id === id ? { ...post, commentCount: post.commentCount + 1 } : post,
+      ),
+    );
+  };
+
+
+
+
+  //댓글 개수 처리를 위한 진동벨 함수 생성
+
 
   return (
     <main className={page.mainContent}>
@@ -122,6 +134,7 @@ const App = () => {
             posts={posts} 
             isLoading={isLoading} 
             onDelete={handleDelete} 
+            onAddComment={handleAddComment}
             loaderRef={loaderRef}
           />
           {/* {nextPage && !isLoading && (
