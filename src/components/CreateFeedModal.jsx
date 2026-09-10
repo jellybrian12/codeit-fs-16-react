@@ -1,12 +1,23 @@
 // ~/instagram-react/src/components/CreateFeedModal.jsx
 import { useRef, useState } from "react";
-import { FaImages, FaXmark } from "react-icons/fa6";
+import { FaArrowLeft, FaImages, FaSpinner, FaXmark } from "react-icons/fa6";
 import styles from "./CreateFeedModal.module.scss";
 import carousel from "./Carousel.module.scss";
 
-const CreateFeedModal = ({ onClose }) => {
+//이미지를 문자열로 변환하는 헬퍼함수
+const readAsDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+
+const CreateFeedModal = ({ onClose, onCreate }) => {
 
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isSending, setIsSending] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -14,8 +25,10 @@ const CreateFeedModal = ({ onClose }) => {
   const handleFileChange = (event)=>{
     const file = event.target.files[0];
     if (file) {
+      setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
     }
+    fileInputRef.current.value = "";
   }
 
   // 컴퓨터에서 선택 버튼 클릭 이벤트 핸들러
@@ -23,6 +36,39 @@ const CreateFeedModal = ({ onClose }) => {
     fileInputRef.current.click();
   }
 
+  //공유하기 버튼을 눌렀을 때 이벤트 핸들러
+
+  const handleShare = async () => {
+    setIsSending(true);
+
+    try {
+      const postImage = await readAsDataUrl(selectedFile);
+      const response = await fetch('http://localhost:3001/posts', {
+      method : 'POST',
+      headers : { "Content-Type": "application/json" },
+      body : JSON.stringify({
+        username: "jaehoon",
+        profileImage: "https://picsum.photos/seed/jaehoon/40/40",
+        postImage, 
+        postAlt: "내가 올린 사진",
+        content: "",
+        minutesAgo: 0,
+        likeCount: 0,
+        commentCount: 0
+      })
+    })
+
+      if (!response.ok) {
+        throw new Error(`서버가${response.status}로 답했어요`);
+      }
+
+      onCreate(await response.json());
+      onClose();
+    } catch (error) {
+      console.error("게시물을 올리지 못했어요.", error);
+      setIsSending(false);
+    }
+  };
   return (
     <div className={styles.modalContainer}>
       <div className={styles.modalBackdrop} onClick={onClose} />
@@ -33,7 +79,27 @@ const CreateFeedModal = ({ onClose }) => {
 
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
+          <button className={styles.backButton} style={{ visibility: "hidden" }} type="button">
+            <FaArrowLeft />
+          </button>
           <h2 className={styles.modalTitle}>새 게시물 만들기</h2>
+
+          {previewUrl && (
+            <button
+              className={`${styles.nextButton}${isSending ? styles.loading : ""}`}
+              onClick={handleShare}
+              disabled={isSending}
+              type="button"
+            >
+              공유하기
+            </button>
+          )}
+
+          {isSending && (
+            <div className={styles.loadingSpinner}>
+              <FaSpinner />
+            </div>
+          )}
         </div>
 
         <div className={styles.modalBody}>

@@ -110,6 +110,8 @@ const App = () => {
   //   setPageNumber((current) => current + 1);
   // };
   
+  //댓글 개수 처리를 위한 진동벨 함수 생성
+
   const handleAddComment = (id) => {
     setPosts((current) =>
       current.map((post) =>
@@ -118,10 +120,12 @@ const App = () => {
     );
   };
 
+  //피드 생성 처리를 위한 진동벨 함수 생성
+  const handleCreate = (createdPost) =>{
+    setPosts(current => [createdPost, ...current])
+  }
 
 
-
-  //댓글 개수 처리를 위한 진동벨 함수 생성
 
 
   return (
@@ -149,7 +153,7 @@ const App = () => {
         </>
       )}
 
-      {isCreateOpen && <CreateFeedModal onClose={()=> setIsCreateOpen(false)}/>}
+      {isCreateOpen && <CreateFeedModal onClose={()=> setIsCreateOpen(false)} onCreate={handleCreate}/>}
 
     </main>
   );
