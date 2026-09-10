@@ -3,41 +3,102 @@ import page from './components/FeedPage.module.scss';
 // import Stories from './lab/p2-07/practice3.jsx';
 import Stories from './components/Stories.jsx';
 import FeedList from "./components/FeedList.jsx";
+import stateStyles from './components/StatusMessage.module.scss';
 
+const PER_PAGE = 2;
 
 const App = () => {
   //데이터배열을 상태로 관리
   const [posts, setPosts] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(() =>
+    localStorage.getItem('lastUser'),
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [nextPage, setNextPage] = useState(null);
 
   useEffect(() => {
+    if (selectedUser) {
+      localStorage.setItem('lastUser', selectedUser);
+    } else {
+      localStorage.removeItem('lastUser');
+    }
+  }, [selectedUser]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let cancelled = false;
+
     const loadPosts = async () => {
+      const condition = `_page=${pageNumber}&_per_page=${PER_PAGE}`;
+      const url = selectedUser
+        ? `http://localhost:3001/posts?username=${selectedUser}&${condition}`
+        : `http://localhost:3001/posts?${condition}`;
+      setIsLoading(true);
+      setError(null)
       try {
-        const response = await fetch('http://localhost:3001/posts');
+        const response = await fetch(url, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`서버가${response.status}로 답했어요`);
         }
-        const data = await response.json();
-        setPosts(data);
-      } catch (error) {
-        console.error('게시물을 가져오지 못했어요.', error);
+        const envelope = await response.json();
+        setPosts([...posts,...envelope.data]);
+        setNextPage(envelope.next);
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          return;
+        }
+        console.error('게시물을 가져오지 못했어요.', err);
+        setError('게시물을 불러오지 못했습니다.');
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     loadPosts();
-  }, []);
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+
+  }, [selectedUser, pageNumber]);
 
   const handleDelete  = (id)=>{
     //지운다는것은 -> 필터링한다는것
     //지금 내가 지목한 얘 빼고 남겨줘 
     setPosts(posts.filter(post => post.id !== id));
   }
+
+  const handleSelectUser = (username) => {
+    // setSelectedUser(selectedUser === username ? null : username)
+    setSelectedUser((current) => (current === username ? null : username));
+    setPageNumber(1);
+    setPosts([])
+  };
+
+  const handleLoadMore = () => {
+    setPageNumber((current) => current + 1);
+  };
+
   return (
     <main className={page.mainContent}>
-      <Stories />
-      <FeedList 
-        posts={posts} 
-        onDelete={handleDelete}
-      />
+      <Stories onSelect={handleSelectUser}/>
+      {error ? (
+        <p className={stateStyles.errorText}>{error}</p>
+      ) : (
+        <>
+          <FeedList posts={posts} isLoading={isLoading} onDelete={handleDelete} />
+          {nextPage && !isLoading && (
+            <button type="button" onClick={handleLoadMore}>
+              더 보기
+            </button>
+          )}
+        </>
+      )}
     </main>
   );
 }

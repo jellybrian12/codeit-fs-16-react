@@ -1,8 +1,8 @@
 import styles from "./Stories.module.scss";
 
-const StoryItem = ({ username, profileImage, unseen }) => {
+const StoryItem = ({ username, profileImage, unseen, onSelect }) => {
   return (
-    <div className={styles.storyItem}>
+    <div className={styles.storyItem} onClick={onSelect}>
       <div className={styles.storyAvatar}>
         {unseen &&<div className={styles.storyRing}></div>}
         <img src={profileImage} alt={`${username}의 스토리`} />

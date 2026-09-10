@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./Stories.module.scss";
 import StoryItem from "./StoryItem.jsx";
 
-const Stories = () => {
+const Stories = ({onSelect}) => {
   const [stories, setStories] = useState([]);
 
   useEffect(()=>{
@@ -20,7 +20,7 @@ const Stories = () => {
     }
 
     loadStories();
-  })
+  },[])
 
   return (
     <div className={styles.storiesContainer}>
@@ -31,6 +31,7 @@ const Stories = () => {
             username={story.username}
             profileImage={`https://picsum.photos/seed/${story.username}/50/50`}
             unseen={story.unseen}
+            onSelect={() => onSelect(story.username)}
           />
         ))}
       </div>
