@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import page from './components/FeedPage.module.scss';
 // import Stories from './lab/p2-07/practice3.jsx';
 import Stories from './components/Stories.jsx';
@@ -17,6 +17,8 @@ const App = () => {
   const [error, setError] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [nextPage, setNextPage] = useState(null);
+
+  const loaderRef = useRef(null);
 
   useEffect(() => {
     if (selectedUser) {
@@ -80,9 +82,34 @@ const App = () => {
     setPosts([])
   };
 
-  const handleLoadMore = () => {
-    setPageNumber((current) => current + 1);
-  };
+  // const handleLoadMore = () => {
+  //   setPageNumber((current) => current + 1);
+  // };
+  
+
+  //무한 스크롤 옵저버 처리
+  useEffect(()=>{
+    if (nextPage === null || isLoading) {
+      return;
+    }
+
+    const target = loaderRef.current;
+    if (target === null) {
+      return;
+    }
+
+    //옵저버를 생성해서 감시를 맡김
+    const observer = new IntersectionObserver((entries)=>{
+      if (entries[0].isIntersecting) {
+        setPageNumber((current) => current + 1);
+      }
+    })
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+
+  },[nextPage, isLoading])
 
   return (
     <main className={page.mainContent}>
@@ -91,12 +118,17 @@ const App = () => {
         <p className={stateStyles.errorText}>{error}</p>
       ) : (
         <>
-          <FeedList posts={posts} isLoading={isLoading} onDelete={handleDelete} />
-          {nextPage && !isLoading && (
+          <FeedList 
+            posts={posts} 
+            isLoading={isLoading} 
+            onDelete={handleDelete} 
+            loaderRef={loaderRef}
+          />
+          {/* {nextPage && !isLoading && (
             <button type="button" onClick={handleLoadMore}>
               더 보기
             </button>
-          )}
+          )} */}
         </>
       )}
     </main>
