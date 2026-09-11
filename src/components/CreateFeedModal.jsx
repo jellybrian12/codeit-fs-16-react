@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { FaArrowLeft, FaImages, FaSpinner, FaXmark } from "react-icons/fa6";
 import styles from "./CreateFeedModal.module.scss";
 import carousel from "./Carousel.module.scss";
+import {postApi} from "../services/api.js";
 
 //이미지를 문자열로 변환하는 헬퍼함수
 const readAsDataUrl = (file) =>
@@ -43,10 +44,7 @@ const CreateFeedModal = ({ onClose, onCreate }) => {
 
     try {
       const postImage = await readAsDataUrl(selectedFile);
-      const response = await fetch('http://localhost:3001/posts', {
-      method : 'POST',
-      headers : { "Content-Type": "application/json" },
-      body : JSON.stringify({
+      const response = await postApi.create({
         username: "jaehoon",
         profileImage: "https://picsum.photos/seed/jaehoon/40/40",
         postImage, 
@@ -55,14 +53,9 @@ const CreateFeedModal = ({ onClose, onCreate }) => {
         minutesAgo: 0,
         likeCount: 0,
         commentCount: 0
-      })
     })
 
-      if (!response.ok) {
-        throw new Error(`서버가${response.status}로 답했어요`);
-      }
-
-      onCreate(await response.json());
+      onCreate(response);
       onClose();
     } catch (error) {
       console.error("게시물을 올리지 못했어요.", error);

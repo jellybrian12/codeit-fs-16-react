@@ -18,7 +18,8 @@ const FeedItem = ({
   likeCount,
   commentCount,
   onDelete,
-  onAddComment
+  onAddComment,
+  postId
 }) => {
   return (
     <article className={styles.post}>
@@ -34,7 +35,7 @@ const FeedItem = ({
         </div>
       </div>
 
-      <FeedItemActions likeCount={likeCount} />
+      <FeedItemActions likeCount={likeCount} postId={postId} />
 
       <div className={styles.content}>
         <FeedItemContent

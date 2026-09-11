@@ -5,6 +5,9 @@ import Stories from './components/Stories.jsx';
 import FeedList from "./components/FeedList.jsx";
 import stateStyles from './components/StatusMessage.module.scss';
 import CreateFeedModal from './components/CreateFeedModal.jsx';
+import {postApi} from "./services/api.js";
+import axios from "axios";
+
 
 const PER_PAGE = 4;
 
@@ -35,21 +38,19 @@ const App = () => {
 
     const loadPosts = async () => {
       const condition = `_page=${pageNumber}&_per_page=${PER_PAGE}`;
-      const url = selectedUser
-        ? `http://localhost:3001/posts?username=${selectedUser}&${condition}`
-        : `http://localhost:3001/posts?${condition}`;
+      const query = selectedUser
+        ? `username=${selectedUser}&${condition}`
+        : condition;
+
       setIsLoading(true);
-      setError(null)
+      setError(null);
+
       try {
-        const response = await fetch(url, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`서버가${response.status}로 답했어요`);
-        }
-        const envelope = await response.json();
-        setPosts([...posts,...envelope.data]);
+        const envelope = await postApi.getPage(query, { signal: controller.signal });
+        setPosts((current) => [...current, ...envelope.data]);
         setNextPage(envelope.next);
       } catch (err) {
-        if (err.name === 'AbortError') {
+        if (axios.isCancel(err)) {
           return;
         }
         console.error('게시물을 가져오지 못했어요.', err);
@@ -93,11 +94,18 @@ const App = () => {
 
   },[nextPage, isLoading])
 
-  const handleDelete  = (id)=>{
-    //지운다는것은 -> 필터링한다는것
-    //지금 내가 지목한 얘 빼고 남겨줘 
-    setPosts(posts.filter(post => post.id !== id));
-  }
+  const handleDelete = async (id) => {
+    //이거 백업 지우기전 포스트 백업
+    const previous = posts;
+    setPosts(posts.filter((post) => post.id !== id));
+
+    try {
+      await postApi.remove(id);
+    } catch (err) {
+      console.error('게시물을 지우지 못했어요.', err);
+      setPosts(previous);
+    }
+  };
 
   const handleSelectUser = (username) => {
     // setSelectedUser(selectedUser === username ? null : username)

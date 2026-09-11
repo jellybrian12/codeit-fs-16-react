@@ -1,8 +1,9 @@
 import { useState } from "react";
 import styles from './FeedItem.module.scss'
 import { FaHeart, FaRegBookmark, FaRegComment, FaRegHeart, FaRegPaperPlane } from "react-icons/fa6";
+import {postApi} from "../services/api.js";
 
-const FeedItemActions = ({likeCount}) => {
+const FeedItemActions = ({likeCount, postId}) => {
   // const [liked, setLiked] = useState(false);
   // const [count, setCount] = useState(likeCount);
 
@@ -11,13 +12,22 @@ const FeedItemActions = ({likeCount}) => {
     count: likeCount,
   });
 
-  const handleLike = () => {
-    setLike({
-      ...like,
+  const handleLike = async () => {
+    const previous = like;
+    const next = {
       liked: !like.liked,
       count: like.liked ? like.count - 1 : like.count + 1,
-    });
+    };
+    setLike(next);
+
+    try {
+      await postApi.updateLikeCount(postId,next.count);
+    } catch (err) {
+      console.error("좋아요를 저장하지 못했어요.", err);
+      setLike(previous);
+    }
   };
+
 
   return (
     <div className={styles.actions}>

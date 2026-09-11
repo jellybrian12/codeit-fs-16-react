@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { storyApi  } from "../services/api.js";
 import styles from "./Stories.module.scss";
 import StoryItem from "./StoryItem.jsx";
 
@@ -8,12 +9,8 @@ const Stories = ({onSelect}) => {
   useEffect(()=>{
     const loadStories = async () =>{
       try{
-        const res = await fetch("http://localhost:3001/stories");
-        if (!res.ok) {
-            throw new Error(`서버가${res.status}로 답했어요`);
-          }
-          const data = await res.json();
-          setStories(data);
+          const found = await storyApi.getAll();
+          setStories(found);
         } catch (error) {
           console.error("스토리를 가져오지 못했어요.", error);
       }
