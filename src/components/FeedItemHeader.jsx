@@ -1,10 +1,14 @@
 import styles from './FeedItem.module.scss'
 import { FaEllipsis } from "react-icons/fa6";
+import { usePostsContext } from '../contexts/PostsContext';
 const FeedItemHeader = ({
+  postId,
   username,
   profileImage = "https://picsum.photos/seed/default/40/40",
-  onDelete,
 }) => {
+
+  const { removePost } = usePostsContext()
+
   return (
     <header className={styles.header}>
       <div className={styles.userInfo}>
@@ -17,7 +21,7 @@ const FeedItemHeader = ({
           <a href={`/${username}`} className="username">{username}</a>
         </div>
       </div>
-      <button className={styles.optionsButton} onClick={onDelete}><FaEllipsis/></button>
+      <button className={styles.optionsButton} onClick={() => removePost(postId)}><FaEllipsis /></button>
     </header>
   );
 };

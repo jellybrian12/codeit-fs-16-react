@@ -2,7 +2,7 @@ import styles from "./FeedList.module.scss";
 import gridStyles from "./PostGrid.module.scss";
 import FeedItem from "./FeedItem.jsx";
 import stateStyles from "./StatusMessage.module.scss";
-
+import { usePostsContext } from "../contexts/PostsContext.jsx";
 
 const FeedSkeleton = () => (
   <div className={styles.skeletonPost}>
@@ -23,9 +23,12 @@ const FeedSkeleton = () => (
   </div>
 );
 
-const FeedList = ({ posts, isLoading, onDelete, loaderRef, onAddComment }) => {
+const FeedList = () => {
+
+  const { posts, isLoading, loaderRef } = usePostsContext();
+
   if (!isLoading && posts.length === 0) {
-    return<p className={gridStyles.noPosts}>게시물이 없습니다.</p>;
+    return <p className={gridStyles.noPosts}>게시물이 없습니다.</p>;
   }
 
   return (
@@ -44,12 +47,11 @@ const FeedList = ({ posts, isLoading, onDelete, loaderRef, onAddComment }) => {
             likeCount={post.likeCount}
             commentCount={post.commentCount}
             onDelete={() => onDelete(post.id)}
-            onAddComment={() => onAddComment(post.id)}
           />
         ))}
       </div>
-      <div 
-        ref={loaderRef} 
+      <div
+        ref={loaderRef}
         className={styles.loader}
       >
         {isLoading && (

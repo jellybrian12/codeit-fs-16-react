@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import styles from './FeedItem.module.scss'
+import { usePostsContext } from '../contexts/PostsContext';
 
-const CommentForm = ({onAddComment}) => {
+const CommentForm = ({ postId }) => {
+  const { countUpComment } = usePostsContext();
+
   const [text, setText] = useState("");
 
   const handleSubmit = event => {
@@ -10,27 +13,27 @@ const CommentForm = ({onAddComment}) => {
     if (text.trim() === "") {
       return;
     }
-    
-    onAddComment();
+
+    countUpComment(postId);
     setText('');
   }
 
   return (
-    <form 
-      className={styles.commentForm} 
+    <form
+      className={styles.commentForm}
       onSubmit={handleSubmit}
     >
-      <input 
-        type="text" 
-        placeholder="댓글 달기..." 
-        className={styles.commentInput} 
+      <input
+        type="text"
+        placeholder="댓글 달기..."
+        className={styles.commentInput}
         value={text}
         onChange={(event) => {
           setText(event.target.value);
         }}
       />
-      <button 
-        type="submit" 
+      <button
+        type="submit"
         className={styles.commentSubmit}
         disabled={text.trim() === ""}
       >

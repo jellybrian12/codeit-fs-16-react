@@ -24,6 +24,7 @@ const FeedItem = ({
   return (
     <article className={styles.post}>
       <FeedItemHeader 
+        postId={postId}
         username={username} 
         profileImage={profileImage} 
         onDelete={onDelete}
@@ -48,7 +49,7 @@ const FeedItem = ({
       <CommentArea>
         <FeedItemComments commentCount={commentCount} />
         <CommentForm 
-          onAddComment={onAddComment}
+          postId={postId} 
         />
       </CommentArea>
 
