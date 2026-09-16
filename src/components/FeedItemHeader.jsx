@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import styles from './FeedItem.module.scss'
 import { FaEllipsis } from "react-icons/fa6";
 import { usePostsContext } from '../contexts/PostsContext';
@@ -12,13 +13,13 @@ const FeedItemHeader = ({
   return (
     <header className={styles.header}>
       <div className={styles.userInfo}>
-        <a href={`/${username}`} className="profileLink">
+        <Link to={`/${username}`} className="profileLink">
           <div className={styles.profileImage}>
             <img src={profileImage} alt={`${username}의 프로필`} />
           </div>
-        </a>
+        </Link>
         <div className={styles.userDetails}>
-          <a href={`/${username}`} className="username">{username}</a>
+          <Link to={`/${username}`} className="username">{username}</Link>
         </div>
       </div>
       <button className={styles.optionsButton} onClick={() => removePost(postId)}><FaEllipsis /></button>
