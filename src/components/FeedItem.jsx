@@ -17,12 +17,17 @@ const FeedItem = ({
   minutesAgo,
   likeCount,
   commentCount,
+  onDelete,
+  onAddComment,
+  postId
 }) => {
   return (
     <article className={styles.post}>
       <FeedItemHeader 
+        postId={postId}
         username={username} 
         profileImage={profileImage} 
+        onDelete={onDelete}
       />
 
       <div className={styles.imageContainer}>
@@ -31,7 +36,7 @@ const FeedItem = ({
         </div>
       </div>
 
-      <FeedItemActions likeCount={likeCount} />
+      <FeedItemActions likeCount={likeCount} postId={postId} />
 
       <div className={styles.content}>
         <FeedItemContent
@@ -43,7 +48,9 @@ const FeedItem = ({
 
       <CommentArea>
         <FeedItemComments commentCount={commentCount} />
-        <CommentForm />
+        <CommentForm 
+          postId={postId} 
+        />
       </CommentArea>
 
     </article>
