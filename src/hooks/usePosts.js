@@ -1,15 +1,19 @@
 import { useState, useEffect, useRef, useCallback  } from 'react';
 import axios from 'axios';
 import { postApi } from '../services/api.js';
+import { useSearchParams } from 'react-router';
 
 const PER_PAGE = 2;
 
 export const usePosts=() => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedUser = searchParams.get('user');
+
   //데이터배열을 상태로 관리
   const [posts, setPosts] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(() =>
-    localStorage.getItem('lastUser'),
-  );
+  // const [selectedUser, setSelectedUser] = useState(() =>
+  //   localStorage.getItem('lastUser'),
+  // );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
@@ -18,11 +22,8 @@ export const usePosts=() => {
   const loaderRef = useRef(null);
 
   useEffect(() => {
-    if (selectedUser) {
-      localStorage.setItem('lastUser', selectedUser);
-    } else {
-      localStorage.removeItem('lastUser');
-    }
+    setPageNumber(1);
+    setPosts([]);
   }, [selectedUser]);
 
   useEffect(() => {
@@ -102,11 +103,18 @@ export const usePosts=() => {
   };
 
   const selectUser = useCallback((username) => {
-    setSelectedUser((current) => (current === username ? null : username));
-    setPageNumber(1);
-    setPosts([]);
-  }, []);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
 
+      if (next.get('user') === username) {
+        next.delete('user');
+      } else {
+        next.set('user', username);
+      }
+
+      return next;
+    });
+  }, [setSearchParams]);
   // const handleLoadMore = () => {
   //   setPageNumber((current) => current + 1);
   // };
